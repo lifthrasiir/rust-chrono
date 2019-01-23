@@ -413,6 +413,9 @@ extern crate num_traits;
 extern crate rustc_serialize;
 #[cfg(feature = "serde")]
 extern crate serde as serdelib;
+#[cfg(feature = "quickcheck-enabled")]
+#[macro_use]
+extern crate quickcheck;
 
 // this reexport is to aid the transition and should not be in the prelude!
 pub use oldtime::Duration;

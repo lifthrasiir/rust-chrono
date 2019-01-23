@@ -1402,6 +1402,20 @@ pub mod serde {
     }
 }
 
+#[cfg(feature = "quickcheck-enabled")]
+impl quickcheck::Arbitrary for DateTime<Utc> {
+    fn arbitrary<G: quickcheck::Gen>(g: &mut G) -> Self {
+        Utc.timestamp(i64::arbitrary(g), u32::arbitrary(g))
+    }
+}
+
+#[cfg(feature = "quickcheck-enabled")]
+impl quickcheck::Arbitrary for DateTime<Local> {
+    fn arbitrary<G: quickcheck::Gen>(g: &mut G) -> Self {
+        Local.timestamp(i64::arbitrary(g), u32::arbitrary(g))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::DateTime;
@@ -1644,4 +1658,17 @@ mod tests {
         assert_eq!(SystemTime::from(epoch.with_timezone(&FixedOffset::east(32400))), UNIX_EPOCH);
         assert_eq!(SystemTime::from(epoch.with_timezone(&FixedOffset::west(28800))), UNIX_EPOCH);
     }
+
+    #[cfg(feature = "quickcheck-enabled")]
+    quickcheck! {
+            #[test]
+            fn qc_test_quickcheck(original_time: DateTime<Utc>) -> quickcheck::TestResult {
+                let seconds = original_time.timestamp();
+                let nanoseconds = original_time.timestamp_subsec_nanos();
+                let reconstructed = Utc.timestamp(seconds, nanoseconds);
+                quickcheck::TestResult::from_bool(
+                    reconstructed == original_time
+                )
+            }
+        }
 }
