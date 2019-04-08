@@ -13,6 +13,8 @@ Versions with only mechanical changes will be omitted from the following list.
 ## Features
 
 * Add `std::convert::From` conversions between the different timezone formats (@mqudsi #271)
+* Add `parse_from_rfc2822()`, `parse_from_rfc3339()`, and `parse_from_str()` methods to `DateTime`
+objects (@mqudsi #278)
 
 ## 0.4.5
 

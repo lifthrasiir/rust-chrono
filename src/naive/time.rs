@@ -159,14 +159,14 @@ use format::{parse, Parsed, ParseError, ParseResult, DelayedFormat, StrftimeItem
 /// and would be read back to the next non-leap second.
 ///
 /// ~~~~
-/// use chrono::{DateTime, Utc, TimeZone};
+/// use chrono::{DateTime, Utc, FixedOffset, TimeZone};
 ///
 /// let dt = Utc.ymd(2015, 6, 30).and_hms_milli(23, 56, 4, 1_000);
 /// assert_eq!(format!("{:?}", dt), "2015-06-30T23:56:05Z");
 ///
 /// let dt = Utc.ymd(2015, 6, 30).and_hms(23, 56, 5);
 /// assert_eq!(format!("{:?}", dt), "2015-06-30T23:56:05Z");
-/// assert_eq!(DateTime::parse_from_rfc3339("2015-06-30T23:56:05Z").unwrap(), dt);
+/// assert_eq!(DateTime::<FixedOffset>::parse_from_rfc3339("2015-06-30T23:56:05Z").unwrap(), dt);
 /// ~~~~
 ///
 /// Since Chrono alone cannot determine any existence of leap seconds,
@@ -1431,7 +1431,7 @@ mod serde {
     impl<'de> de::Visitor<'de> for NaiveTimeVisitor {
         type Value = NaiveTime;
 
-        fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result 
+        fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result
         {
             write!(formatter, "a formatted time string")
         }

@@ -310,6 +310,52 @@ fn map_local<Tz: TimeZone, F>(dt: &DateTime<Tz>, mut f: F) -> Option<DateTime<Tz
     f(dt.naive_local()).and_then(|datetime| dt.timezone().from_local_datetime(&datetime).single())
 }
 
+impl DateTime<Utc> {
+    /// Parses an RFC 2822 date and time string such as `Tue, 1 Jul 2003 10:52:37 +0200`,
+    /// then returns a new `DateTime<Utc>` instance corresponding to the UTC date/time accounting
+    /// for the difference between UTC and the parsed timezone.
+    pub fn parse_from_rfc2822(s: &str) -> ParseResult<DateTime<Utc>> {
+        DateTime::<FixedOffset>::parse_from_rfc2822(s)
+            .map(|result| result.into())
+    }
+
+    /// Parses an RFC 3339 and ISO 8601 date and time string such as `1996-12-19T16:39:57-08:00`,
+    /// then returns a new `DateTime<Utc>` instance corresponding to the UTC date/time accounting
+    /// for the difference between UTC and the parsed timezone.
+    ///
+    /// Why isn't this named `parse_from_iso8601`? That's because ISO 8601 allows some freedom
+    /// over the syntax and RFC 3339 exercises that freedom to rigidly define a fixed format.
+    pub fn parse_from_rfc3339(s: &str) -> ParseResult<DateTime<Utc>> {
+        DateTime::<FixedOffset>::parse_from_rfc2822(s)
+            .map(|result| result.into())
+    }
+
+    /// Parses a string with the specified format string and
+    /// returns a new `DateTime` with a parsed `FixedOffset`.
+    /// See the [`format::strftime` module](./format/strftime/index.html)
+    /// on the supported escape sequences.
+    ///
+    /// See also `Offset::datetime_from_str` which gives a local `DateTime` on specific time zone.
+    ///
+    /// Note that this method *requires a timezone* in the string. See
+    /// [`NaiveDateTime::parse_from_str`](./naive/struct.NaiveDateTime.html#method.parse_from_str)
+    /// for a version that does not require a timezone in the to-be-parsed str.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use chrono::{DateTime, TimeZone, Utc};
+    ///
+    /// let dt = DateTime::<Utc>::parse_from_str(
+    ///     "1983 Apr 13 12:09:14.274 +0100", "%Y %b %d %H:%M:%S%.3f %z");
+    /// assert_eq!(dt, Ok(Utc.ymd(1983, 4, 13).and_hms_milli(11, 9, 14, 274)));
+    /// ```
+    pub fn parse_from_str(s: &str, fmt: &str) -> ParseResult<DateTime<Utc>> {
+        DateTime::<FixedOffset>::parse_from_str(s, fmt)
+            .map(|result| result.into())
+    }
+}
+
 impl DateTime<FixedOffset> {
     /// Parses an RFC 2822 date and time string such as `Tue, 1 Jul 2003 10:52:37 +0200`,
     /// then returns a new `DateTime` with a parsed `FixedOffset`.
@@ -348,7 +394,7 @@ impl DateTime<FixedOffset> {
     /// ```rust
     /// use chrono::{DateTime, FixedOffset, TimeZone};
     ///
-    /// let dt = DateTime::parse_from_str(
+    /// let dt = DateTime::<FixedOffset>::parse_from_str(
     ///     "1983 Apr 13 12:09:14.274 +0000", "%Y %b %d %H:%M:%S%.3f %z");
     /// assert_eq!(dt, Ok(FixedOffset::east(0).ymd(1983, 4, 13).and_hms_milli(12, 9, 14, 274)));
     /// ```
@@ -1586,13 +1632,13 @@ mod tests {
         assert_eq!(EDT.ymd(2015, 2, 18).and_hms_micro(23, 59, 59, 1_234_567).to_rfc3339(),
                    "2015-02-18T23:59:60.234567+05:00");
 
-        assert_eq!(DateTime::parse_from_rfc2822("Wed, 18 Feb 2015 23:16:09 +0000"),
+        assert_eq!(DateTime::<FixedOffset>::parse_from_rfc2822("Wed, 18 Feb 2015 23:16:09 +0000"),
                    Ok(FixedOffset::east(0).ymd(2015, 2, 18).and_hms(23, 16, 9)));
-        assert_eq!(DateTime::parse_from_rfc3339("2015-02-18T23:16:09Z"),
+        assert_eq!(DateTime::<FixedOffset>::parse_from_rfc3339("2015-02-18T23:16:09Z"),
                    Ok(FixedOffset::east(0).ymd(2015, 2, 18).and_hms(23, 16, 9)));
-        assert_eq!(DateTime::parse_from_rfc2822("Wed, 18 Feb 2015 23:59:60 +0500"),
+        assert_eq!(DateTime::<FixedOffset>::parse_from_rfc2822("Wed, 18 Feb 2015 23:59:60 +0500"),
                    Ok(EDT.ymd(2015, 2, 18).and_hms_milli(23, 59, 59, 1_000)));
-        assert_eq!(DateTime::parse_from_rfc3339("2015-02-18T23:59:60.234567+05:00"),
+        assert_eq!(DateTime::<FixedOffset>::parse_from_rfc3339("2015-02-18T23:59:60.234567+05:00"),
                    Ok(EDT.ymd(2015, 2, 18).and_hms_micro(23, 59, 59, 1_234_567)));
     }
 
@@ -1646,10 +1692,10 @@ mod tests {
     #[test]
     fn test_datetime_parse_from_str() {
         let ymdhms = |y,m,d,h,n,s,off| FixedOffset::east(off).ymd(y,m,d).and_hms(h,n,s);
-        assert_eq!(DateTime::parse_from_str("2014-5-7T12:34:56+09:30", "%Y-%m-%dT%H:%M:%S%z"),
+        assert_eq!(DateTime::<FixedOffset>::parse_from_str("2014-5-7T12:34:56+09:30", "%Y-%m-%dT%H:%M:%S%z"),
                    Ok(ymdhms(2014, 5, 7, 12, 34, 56, 570*60))); // ignore offset
-        assert!(DateTime::parse_from_str("20140507000000", "%Y%m%d%H%M%S").is_err()); // no offset
-        assert!(DateTime::parse_from_str("Fri, 09 Aug 2013 23:54:35 GMT",
+        assert!(DateTime::<FixedOffset>::parse_from_str("20140507000000", "%Y%m%d%H%M%S").is_err()); // no offset
+        assert!(DateTime::<FixedOffset>::parse_from_str("Fri, 09 Aug 2013 23:54:35 GMT",
                                          "%a, %d %b %Y %H:%M:%S GMT").is_err());
         assert_eq!(Utc.datetime_from_str("Fri, 09 Aug 2013 23:54:35 GMT",
                                          "%a, %d %b %Y %H:%M:%S GMT"),
