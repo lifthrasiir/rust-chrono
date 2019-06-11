@@ -1579,8 +1579,12 @@ mod tests {
                    "2015-02-18T23:16:09+00:00");
         assert_eq!(EDT.ymd(2015, 2, 18).and_hms_milli(23, 16, 9, 150).to_rfc2822(),
                    "Wed, 18 Feb 2015 23:16:09 +0500");
+        assert_eq!(EDT.ymd(2015, 2, 3).and_hms_milli(23, 16, 9, 150).to_rfc2822(),
+                   "Tue, 3 Feb 2015 23:16:09 +0500");
         assert_eq!(EDT.ymd(2015, 2, 18).and_hms_milli(23, 16, 9, 150).to_rfc3339(),
                    "2015-02-18T23:16:09.150+05:00");
+        assert_eq!(EDT.ymd(2015, 2, 3).and_hms_milli(23, 16, 9, 150).to_rfc3339(),
+                   "2015-02-03T23:16:09.150+05:00");
         assert_eq!(EDT.ymd(2015, 2, 18).and_hms_micro(23, 59, 59, 1_234_567).to_rfc2822(),
                    "Wed, 18 Feb 2015 23:59:60 +0500");
         assert_eq!(EDT.ymd(2015, 2, 18).and_hms_micro(23, 59, 59, 1_234_567).to_rfc3339(),
