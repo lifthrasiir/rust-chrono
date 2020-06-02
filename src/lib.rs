@@ -440,7 +440,7 @@ pub use oldtime::Duration;
 #[cfg(feature="clock")]
 #[doc(no_inline)] pub use offset::Local;
 #[doc(no_inline)] pub use offset::{TimeZone, Offset, LocalResult, Utc, FixedOffset};
-#[doc(no_inline)] pub use naive::{NaiveDate, IsoWeek, NaiveTime, NaiveDateTime};
+#[doc(no_inline)] pub use naive::{NaiveDate, IsoWeek, NaiveTime, NaiveDateTime, NaivePeriod};
 pub use date::{Date, MIN_DATE, MAX_DATE};
 pub use datetime::{DateTime, SecondsFormat};
 #[cfg(feature = "rustc-serialize")]
@@ -455,7 +455,7 @@ pub mod prelude {
     #[cfg(feature="clock")]
     #[doc(no_inline)] pub use Local;
     #[doc(no_inline)] pub use {Utc, FixedOffset};
-    #[doc(no_inline)] pub use {NaiveDate, NaiveTime, NaiveDateTime};
+    #[doc(no_inline)] pub use {NaiveDate, NaiveTime, NaiveDateTime, NaivePeriod};
     #[doc(no_inline)] pub use Date;
     #[doc(no_inline)] pub use {DateTime, SecondsFormat};
     #[doc(no_inline)] pub use SubsecRound;
@@ -482,11 +482,14 @@ pub mod naive {
     mod isoweek;
     mod time;
     mod datetime;
+    mod period;
 
     pub use self::date::{NaiveDate, MIN_DATE, MAX_DATE};
     pub use self::isoweek::IsoWeek;
     pub use self::time::NaiveTime;
     pub use self::datetime::NaiveDateTime;
+    pub use self::period::NaivePeriod;
+
     #[cfg(feature = "rustc-serialize")]
     #[allow(deprecated)]
     pub use self::datetime::rustc_serialize::TsSeconds;
