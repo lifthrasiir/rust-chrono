@@ -297,6 +297,56 @@ impl Duration {
         }
         Ok(StdDuration::new(self.secs as u64, self.nanos as u32))
     }
+
+    /// Creates an `OldDuration` from an ISO-8601-like duration expression.
+    ///
+    /// These duration expressions look like `P4DT3M1S` for "four days,
+    /// three minutes and one second". The "accurate" definition of days and weeks
+    /// is used, not the human concept.
+    ///
+    /// Accepts only Weeks, Days, Hours, Minutes and Seconds.
+    ///
+    /// Very little validation is done. `P3.1MT3M` will be parsed as
+    /// "six minutes, six seconds", not "three and a bit months, three minutes"
+    /// as you might expect, or rejected, as the standard expects.
+    pub fn from_str_sloppy(input: &str) -> Result<Duration, &'static str> {
+        let mut parts = input.match_indices(|c: char| c.is_alphabetic());
+
+        let (sign, mut last) = match parts.next() {
+            Some((0, "p")) | Some((0, "P")) => (1, 1),
+            Some((1, "p")) | Some((1, "P")) if input.starts_with('-') => (-1, 2),
+            _ => return Err("invalid prefix, expecting 'P' or '-P'"),
+        };
+
+        let mut run = 0;
+
+        for (idx, command) in parts {
+            let body = &input[last..idx];
+
+            let mul = match command {
+                "T" => if body.is_empty() {
+                    None
+                } else {
+                    return Err("'T' preceded by value");
+                },
+                "S" => Some(1),
+                "M" => Some(SECS_PER_MINUTE),
+                "H" => Some(SECS_PER_HOUR),
+                "D" => Some(SECS_PER_DAY),
+                "W" => Some(SECS_PER_WEEK),
+                _ => return Err("invalid command"),
+            };
+
+            if let Some(mul) = mul {
+                let number_part = body.parse::<f64>().map_err(|_| "invalid numeric part")?;
+                run += mul * (number_part * NANOS_PER_SEC as f64).round() as i64;
+            }
+
+            last = idx + 1;
+        }
+
+        Ok(Duration::nanoseconds(sign * run))
+    }
 }
 
 impl Neg for Duration {
@@ -644,6 +694,19 @@ mod tests {
             format!("{:30}", Duration::days(1) + Duration::milliseconds(2345)),
             "P1DT2.345S"
         );
+    }
+
+    #[test]
+    fn test_duration_parse() {
+        assert_eq!(Duration::from_str_sloppy("PT0S"), Ok(Duration::zero()));
+        assert_eq!(Duration::from_str_sloppy("P42D"), Ok(Duration::days(42)));
+        assert_eq!(Duration::from_str_sloppy("-P42D"), Ok(Duration::days(-42)));
+        assert_eq!(Duration::from_str_sloppy("PT42S"), Ok(Duration::seconds(42)));
+        assert_eq!(Duration::from_str_sloppy("PT0.042S"), Ok(Duration::milliseconds(42)));
+
+        // sillier things that are also accepted
+        assert_eq!(Duration::from_str_sloppy("P5ST6S"), Ok(Duration::seconds(11)));
+        assert_eq!(Duration::from_str_sloppy("P3.1MT3M"), Ok(Duration::seconds(60 * 6 + 6)));
     }
 
     #[test]
