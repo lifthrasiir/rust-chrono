@@ -75,6 +75,10 @@ pub enum Numeric {
     /// Full Gregorian year (FW=4, PW=∞).
     /// May accept years before 1 BCE or after 9999 CE, given an initial sign.
     Year,
+    /// Full Gregorian year (FW=2, PW=∞). Can be negative.
+    ///
+    /// Prints last two digits for year >= 1000 or year <= -1000.
+    ShortYear,
     /// Gregorian year divided by 100 (century number; FW=PW=2). Implies the non-negative year.
     YearDiv100,
     /// Gregorian year modulo 100 (FW=PW=2). Cannot be negative.
@@ -225,6 +229,31 @@ pub enum Fixed {
     Internal(InternalFixed),
 }
 
+/// Fixed-format item types used for example in Excel formats
+///
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub enum FixedExt {
+    /// One letter month names.
+    ///
+    /// Prints only first letter.
+    OneLetterMonthName,
+    /// One letter day of the week names.
+    ///
+    /// Prints only first letter.
+    OneLetterWeekdayName,
+    /// a/p.
+    ///
+    /// Prints only first letter.
+    OneLetterLowerAmPm,
+    /// A/P.
+    ///
+    /// Prints only first letter.
+    OneLetterUpperAmPm,
+    // Do not match against this.
+    #[doc(hidden)]
+    __DoNotMatch,
+}
+
 /// An opaque type representing fixed-format item types for internal uses only.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InternalFixed {
@@ -268,6 +297,8 @@ pub enum Item<'a> {
     Numeric(Numeric, Pad),
     /// Fixed-format item.
     Fixed(Fixed),
+    /// Extra fixed-format item.
+    FixedExt(FixedExt),
     /// Issues a formatting error. Used to signal an invalid format string.
     Error,
 }
@@ -417,9 +448,12 @@ fn format_inner<'a>(
         "November",
         "December",
     ];
+    static ONE_LETTER_MONTHS: [&'static str; 12] =
+        ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
     static SHORT_WEEKDAYS: [&'static str; 7] = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
     static LONG_WEEKDAYS: [&'static str; 7] =
         ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    static ONE_LETTER_WEEKDAYS: [&'static str; 7] = ["M", "T", "W", "T", "F", "S", "S"];
 
     use core::fmt::Write;
 
@@ -637,6 +671,41 @@ fn format_inner<'a>(
                         }
                     }
                 };
+
+            match ret {
+                Some(ret) => ret?,
+                None => return Err(fmt::Error), // insufficient arguments for given format
+            }
+        },
+
+        Item::FixedExt(ref spec) => {
+            use self::FixedExt::*;
+
+            let ret = match spec {
+                &OneLetterMonthName =>
+                    date.map(|d| {
+                        result.push_str(ONE_LETTER_MONTHS[d.month0() as usize]);
+                        Ok(())
+                    }),
+                &OneLetterWeekdayName =>
+                    date.map(|d| {
+                        result.push_str(
+                            ONE_LETTER_WEEKDAYS[d.weekday().num_days_from_monday() as usize]
+                        );
+                        Ok(())
+                    }),
+                &OneLetterLowerAmPm =>
+                    time.map(|t| {
+                        result.push_str(if t.hour12().0 {"p"} else {"a"});
+                        Ok(())
+                    }),
+                &OneLetterUpperAmPm =>
+                    time.map(|t| {
+                        result.push_str(if t.hour12().0 {"P"} else {"A"});
+                        Ok(())
+                    }),
+                _ => return Err(fmt::Error),
+            };
 
             match ret {
                 Some(ret) => ret?,

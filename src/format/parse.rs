@@ -439,6 +439,27 @@ where
                 }
             }
 
+            &Item::FixedExt(ref spec) => {
+                use super::FixedExt::*;
+
+                match spec {
+                    &OneLetterMonthName | &OneLetterWeekdayName => return Err((s, NOT_ENOUGH)),
+
+                    &OneLetterLowerAmPm | &OneLetterUpperAmPm => {
+                        if s.len() < 1 { return Err((s, TOO_SHORT)); }
+                        let ampm = match s.as_bytes()[0] | 32 {
+                            b'a' => false,
+                            b'p' => true,
+                            _ => return Err((s, INVALID))
+                        };
+                        parsed.set_ampm(ampm).map_err(|e| (s, e))?;
+                        s = &s[1..];
+                    }
+
+                    _ => return Err((s, INVALID)),
+                }
+            }
+
             Item::Error => {
                 return Err((s, BAD_FORMAT));
             }
@@ -581,6 +602,12 @@ fn test_parse() {
     check!("  +   42",    [num!(Year)]; INVALID);
     check!("-",           [num!(Year)]; TOO_SHORT);
     check!("+",           [num!(Year)]; TOO_SHORT);
+
+    // short year
+    check!("87",    [num!(ShortYear)]; year: 1987);
+    check!("68",    [num!(ShortYear)]; year: 2068);
+    check!("-1",    [num!(ShortYear)]; OUT_OF_RANGE);
+    check!("100",   [num!(ShortYear)]; TOO_LONG);
 
     // unsigned numeric
     check!("345",   [num!(Ordinal)]; ordinal: 345);

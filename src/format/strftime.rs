@@ -518,3 +518,60 @@ fn test_strftime_docs() {
     assert_eq!(dt.format("%n").to_string(), "\n");
     assert_eq!(dt.format("%%").to_string(), "%");
 }
+
+#[cfg(test)]
+#[test]
+fn test_fixed_ext() {
+    use {FixedOffset, TimeZone, Timelike};
+    use datetime::DateTime;
+    use format::{DelayedFormat, FixedExt};
+
+    fn test(dt: DateTime<FixedOffset>, item: FixedExt, expected: &str) {
+        let items = vec![Item::FixedExt(item)];
+        let local = dt.naive_local();
+        let f = DelayedFormat::new_with_offset(
+            Some(local.date()),
+            Some(local.time()),
+            dt.offset(),
+            items.iter()
+        );
+        assert_eq!(f.to_string(), expected);
+    }
+
+    let mut dt = FixedOffset::east(34200).ymd(2001, 7, 8).and_hms_nano(1, 34, 59, 1_026_490_708);
+    test(dt, FixedExt::OneLetterMonthName, "J");
+    test(dt, FixedExt::OneLetterWeekdayName, "S");
+    test(dt, FixedExt::OneLetterLowerAmPm, "a");
+    test(dt, FixedExt::OneLetterUpperAmPm, "A");
+
+    dt = dt.with_hour(13).unwrap();
+    test(dt, FixedExt::OneLetterLowerAmPm, "p");
+    test(dt, FixedExt::OneLetterUpperAmPm, "P");
+}
+
+
+#[cfg(test)]
+#[test]
+fn test_short_year() {
+    use {FixedOffset, TimeZone, Datelike};
+    use datetime::DateTime;
+    use format::DelayedFormat;
+
+    fn test(dt: DateTime<FixedOffset>, expected: &str) {
+        let items = vec![Item::Numeric(Numeric::ShortYear, Pad::None)];
+        let local = dt.naive_local();
+        let f = DelayedFormat::new_with_offset(
+            Some(local.date()),
+            Some(local.time()),
+            dt.offset(),
+            items.iter()
+        );
+        assert_eq!(f.to_string(), expected);
+    }
+
+    let mut dt = FixedOffset::east(34200).ymd(2068, 7, 8).and_hms_nano(1, 34, 59, 1_026_490_708);
+    test(dt, "68");
+
+    dt = dt.with_year(1999).unwrap();
+    test(dt, "99");
+}
