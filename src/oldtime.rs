@@ -373,6 +373,20 @@ impl Div<i32> for Duration {
     }
 }
 
+#[cfg(any(feature = "std", test))]
+impl<'a> std::iter::Sum<&'a Duration> for Duration {
+    fn sum<I: Iterator<Item = &'a Duration>>(iter: I) -> Duration {
+        iter.fold(Duration::zero(), |acc, x| acc + *x)
+    }
+}
+
+#[cfg(any(feature = "std", test))]
+impl std::iter::Sum<Duration> for Duration {
+    fn sum<I: Iterator<Item = Duration>>(iter: I) -> Duration {
+        iter.fold(Duration::zero(), |acc, x| acc + x)
+    }
+}
+
 impl fmt::Display for Duration {
     /// Format a duration using the [ISO 8601] format
     ///
@@ -628,6 +642,27 @@ mod tests {
         assert_eq!(Duration::seconds(-1) / -2, Duration::milliseconds(500));
         assert_eq!(Duration::seconds(-4) / 3, Duration::nanoseconds(-1_333_333_333));
         assert_eq!(Duration::seconds(-4) / -3, Duration::nanoseconds(1_333_333_333));
+    }
+
+    #[test]
+    fn test_duration_sum() {
+        let duration_list_1 = [Duration::zero(), Duration::seconds(1)];
+        let sum_1: Duration = duration_list_1.iter().sum();
+        assert_eq!(sum_1, Duration::seconds(1));
+
+        let duration_list_2 =
+            [Duration::zero(), Duration::seconds(1), Duration::seconds(6), Duration::seconds(10)];
+        let sum_2: Duration = duration_list_2.iter().sum();
+        assert_eq!(sum_2, Duration::seconds(17));
+
+        let duration_vec = vec![
+            Duration::zero(),
+            Duration::seconds(1),
+            Duration::seconds(6),
+            Duration::seconds(10),
+        ];
+        let sum_3: Duration = duration_vec.into_iter().sum();
+        assert_eq!(sum_3, Duration::seconds(17));
     }
 
     #[test]

@@ -22,6 +22,7 @@ Eunchong Yu <kroisse@gmail.com>
 Frans Skarman <frans.skarman@gmail.com>
 Huon Wilson <dbau.pp+github@gmail.com>
 Igor Gnatenko <ignatenko@redhat.com>
+Jake Vossen <jake@vossen.dev>
 Jim Turner <jturner314@gmail.com>
 Jisoo Park <xxxyel@gmail.com>
 Joe Wilm <joe@jwilm.com>
