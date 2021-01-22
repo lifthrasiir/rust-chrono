@@ -415,11 +415,13 @@ impl NaiveDate {
     /// assert_eq!(from_ndays_opt(-100_000_000), None);
     /// ```
     pub fn from_num_days_from_ce_opt(days: i32) -> Option<NaiveDate> {
-        let days = days + 365; // make December 31, 1 BCE equal to day 0
-        let (year_div_400, cycle) = div_mod_floor(days, 146_097);
-        let (year_mod_400, ordinal) = internals::cycle_to_yo(cycle as u32);
-        let flags = YearFlags::from_year_mod_400(year_mod_400 as i32);
-        NaiveDate::from_of(year_div_400 * 400 + year_mod_400 as i32, Of::new(ordinal, flags))
+        // make December 31, 1 BCE equal to day 0
+        days.checked_add(365).and_then(|days| {
+            let (year_div_400, cycle) = div_mod_floor(days, 146_097);
+            let (year_mod_400, ordinal) = internals::cycle_to_yo(cycle as u32);
+            let flags = YearFlags::from_year_mod_400(year_mod_400 as i32);
+            NaiveDate::from_of(year_div_400 * 400 + year_mod_400 as i32, Of::new(ordinal, flags))
+        })
     }
 
     /// Makes a new `NaiveDate` by counting the number of occurrences of a particular day-of-week
@@ -2025,6 +2027,14 @@ mod tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn test_date_from_num_days_from_ce_opt() {
+        let ndays_from_ce = |days| NaiveDate::from_num_days_from_ce_opt(days);
+        ndays_from_ce(i32::MAX);
+        assert!(ndays_from_ce(0).is_some());
+        ndays_from_ce(i32::MIN);
     }
 
     #[test]
