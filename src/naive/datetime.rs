@@ -1534,8 +1534,6 @@ where
     F: Fn(&NaiveDateTime) -> Result<String, E>,
     E: ::std::fmt::Debug,
 {
-    use naive::{MAX_DATE, MIN_DATE};
-
     assert_eq!(
         to_string(&NaiveDate::from_ymd(2016, 7, 8).and_hms_milli(9, 10, 48, 90)).ok(),
         Some(r#""2016-07-08T09:10:48.090""#.into())
@@ -1568,8 +1566,6 @@ where
     F: Fn(&str) -> Result<NaiveDateTime, E>,
     E: ::std::fmt::Debug,
 {
-    use naive::{MAX_DATE, MIN_DATE};
-
     assert_eq!(
         from_str(r#""2016-07-08T09:10:48.090""#).ok(),
         Some(NaiveDate::from_ymd(2016, 7, 8).and_hms_milli(9, 10, 48, 90))
