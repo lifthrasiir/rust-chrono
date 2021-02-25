@@ -834,11 +834,24 @@ use core::fmt;
 
 /// An error resulting from reading `Weekday` value with `FromStr`.
 #[derive(Clone, PartialEq)]
-pub struct ParseWeekdayError {
-    _dummy: (),
-}
+pub struct ParseWeekdayError {}
 
 impl fmt::Debug for ParseWeekdayError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "ParseWeekdayError {{ .. }}")
+    }
+}
+
+#[cfg(any(feature = "std", test))]
+impl std::error::Error for ParseWeekdayError {
+    #[allow(deprecated)]
+    fn description(&self) -> &str {
+        "Weekday parser error, see to_string() for details"
+    }
+}
+
+#[cfg(any(feature = "std", test))]
+impl fmt::Display for ParseWeekdayError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "ParseWeekdayError {{ .. }}")
     }
@@ -1137,13 +1150,26 @@ impl num_traits::FromPrimitive for Month {
 
 /// An error resulting from reading `<Month>` value with `FromStr`.
 #[derive(Clone, PartialEq)]
-pub struct ParseMonthError {
-    _dummy: (),
-}
+pub struct ParseMonthError {}
 
 impl fmt::Debug for ParseMonthError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "ParseMonthError {{ .. }}")
+    }
+}
+
+#[cfg(any(feature = "std", test))]
+impl std::error::Error for ParseMonthError {
+    #[allow(deprecated)]
+    fn description(&self) -> &str {
+        "Month parser error, see to_string() for details"
+    }
+}
+
+#[cfg(any(feature = "std", test))]
+impl fmt::Display for ParseMonthError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "ParseWeekdayError {{ .. }}")
     }
 }
 
