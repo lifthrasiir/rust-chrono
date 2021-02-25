@@ -847,7 +847,7 @@ impl std::error::Error for ParseWeekdayError {}
 
 #[cfg(feature = "std")]
 impl fmt::Display for ParseWeekdayError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "ParseWeekdayError {{ .. }}")
     }
 }
@@ -1158,7 +1158,7 @@ impl std::error::Error for ParseMonthError {}
 
 #[cfg(feature = "std")]
 impl fmt::Display for ParseMonthError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "ParseWeekdayError {{ .. }}")
     }
 }
