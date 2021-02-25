@@ -834,12 +834,20 @@ use core::fmt;
 
 /// An error resulting from reading `Weekday` value with `FromStr`.
 #[derive(Clone, PartialEq)]
-pub struct ParseWeekdayError {
-    _dummy: (),
-}
+pub struct ParseWeekdayError {}
 
 impl fmt::Debug for ParseWeekdayError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "ParseWeekdayError {{ .. }}")
+    }
+}
+
+#[cfg(feature = "std")]
+impl std::error::Error for ParseWeekdayError {}
+
+#[cfg(feature = "std")]
+impl fmt::Display for ParseWeekdayError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "ParseWeekdayError {{ .. }}")
     }
 }
