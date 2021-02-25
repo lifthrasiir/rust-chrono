@@ -1145,13 +1145,21 @@ impl num_traits::FromPrimitive for Month {
 
 /// An error resulting from reading `<Month>` value with `FromStr`.
 #[derive(Clone, PartialEq)]
-pub struct ParseMonthError {
-    _dummy: (),
-}
+pub struct ParseMonthError {}
 
 impl fmt::Debug for ParseMonthError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "ParseMonthError {{ .. }}")
+    }
+}
+
+#[cfg(feature = "std")]
+impl std::error::Error for ParseMonthError {}
+
+#[cfg(feature = "std")]
+impl fmt::Display for ParseMonthError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "ParseWeekdayError {{ .. }}")
     }
 }
 

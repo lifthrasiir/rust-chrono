@@ -862,7 +862,7 @@ impl FromStr for Weekday {
         if let Ok(("", w)) = scan::short_or_long_weekday(s) {
             Ok(w)
         } else {
-            Err(ParseWeekdayError { _dummy: () })
+            Err(ParseWeekdayError {})
         }
     }
 }
@@ -947,10 +947,10 @@ impl FromStr for Month {
                 9 => Ok(Month::October),
                 10 => Ok(Month::November),
                 11 => Ok(Month::December),
-                _ => Err(ParseMonthError { _dummy: () }),
+                _ => Err(ParseMonthError { }),
             }
         } else {
-            Err(ParseMonthError { _dummy: () })
+            Err(ParseMonthError { })
         }
     }
 }
