@@ -842,10 +842,15 @@ impl fmt::Debug for ParseWeekdayError {
     }
 }
 
-#[cfg(feature = "std")]
-impl std::error::Error for ParseWeekdayError {}
+#[cfg(any(feature = "std", test))]
+impl std::error::Error for ParseWeekdayError {
+    #[allow(deprecated)]
+    fn description(&self) -> &str {
+        "Weekday parser error, see to_string() for details"
+    }
+}
 
-#[cfg(feature = "std")]
+#[cfg(any(feature = "std", test))]
 impl fmt::Display for ParseWeekdayError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "ParseWeekdayError {{ .. }}")
@@ -1153,10 +1158,15 @@ impl fmt::Debug for ParseMonthError {
     }
 }
 
-#[cfg(feature = "std")]
-impl std::error::Error for ParseMonthError {}
+#[cfg(any(feature = "std", test))]
+impl std::error::Error for ParseMonthError {
+    #[allow(deprecated)]
+    fn description(&self) -> &str {
+        "Month parser error, see to_string() for details"
+    }
+}
 
-#[cfg(feature = "std")]
+#[cfg(any(feature = "std", test))]
 impl fmt::Display for ParseMonthError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "ParseWeekdayError {{ .. }}")
