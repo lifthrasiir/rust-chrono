@@ -947,10 +947,10 @@ impl FromStr for Month {
                 9 => Ok(Month::October),
                 10 => Ok(Month::November),
                 11 => Ok(Month::December),
-                _ => Err(ParseMonthError { }),
+                _ => Err(ParseMonthError {}),
             }
         } else {
-            Err(ParseMonthError { })
+            Err(ParseMonthError {})
         }
     }
 }
