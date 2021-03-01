@@ -496,7 +496,7 @@ extern crate wasm_bindgen;
 doctest!("../README.md");
 
 // this reexport is to aid the transition and should not be in the prelude!
-pub use oldtime::Duration;
+pub use oldtime::{Duration, OutOfRangeError};
 
 pub use date::{Date, MAX_DATE, MIN_DATE};
 #[cfg(feature = "rustc-serialize")]
