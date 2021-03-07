@@ -457,6 +457,97 @@ fn div_rem_64(this: i64, other: i64) -> (i64, i64) {
     (this / other, this % other)
 }
 
+#[cfg(feature = "pyo3")]
+mod pyo3 {
+    use super::{div_mod_floor_64, NANOS_PER_MICRO, SECS_PER_DAY};
+    use crate::Duration;
+    use pyo3::conversion::{FromPyObject, IntoPy, PyTryFrom, ToPyObject};
+    use pyo3::types::{PyDelta, PyDeltaAccess};
+    use std::convert::TryInto;
+
+    impl ToPyObject for Duration {
+        fn to_object(&self, py: pyo3::Python) -> pyo3::PyObject {
+            let micros = self.nanos / NANOS_PER_MICRO;
+            let (days, secs) = div_mod_floor_64(self.secs, SECS_PER_DAY);
+            // Python will check overflow so even if we reduce the size
+            // it will still overflow.
+            let days = days.try_into().unwrap_or(i32::MAX);
+            let secs = secs.try_into().unwrap_or(i32::MAX);
+
+            // We do not need to check i64 to i32 cast from rust because
+            // python will panic with OverflowError.
+            // Not sure if we need normalize here.
+            let delta =
+                PyDelta::new(py, days, secs, micros, false).expect("Failed to construct delta");
+            delta.into()
+        }
+    }
+
+    impl IntoPy<pyo3::PyObject> for Duration {
+        fn into_py(self, py: pyo3::Python) -> pyo3::PyObject {
+            ToPyObject::to_object(&self, py)
+        }
+    }
+
+    impl FromPyObject<'_> for Duration {
+        fn extract(ob: &pyo3::PyAny) -> pyo3::PyResult<Duration> {
+            let delta = <PyDelta as PyTryFrom>::try_from(ob)?;
+            // Python size are much lower than rust size so we do not need bound checks.
+            // 0 <= microseconds < 1000000
+            // 0 <= seconds < 3600*24
+            // -999999999 <= days <= 999999999
+            let secs = delta.get_days() as i64 * SECS_PER_DAY + delta.get_seconds() as i64;
+            let nanos = delta.get_microseconds() * NANOS_PER_MICRO;
+
+            Ok(Duration { secs, nanos })
+        }
+    }
+
+    #[test]
+    fn test_pyo3_topyobject() {
+        use std::cmp::Ordering;
+        use std::panic;
+
+        let gil = pyo3::Python::acquire_gil();
+        let py = gil.python();
+        let check = |s, ns, py_d, py_s, py_ms| {
+            let delta = Duration { secs: s, nanos: ns }.to_object(py);
+            let delta: &PyDelta = delta.extract(py).unwrap();
+            let py_delta = PyDelta::new(py, py_d, py_s, py_ms, true).unwrap();
+            assert_eq!(delta.compare(py_delta).unwrap(), Ordering::Equal);
+        };
+        let check_panic = |duration: Duration| {
+            assert!(panic::catch_unwind(|| {
+                let gil = pyo3::Python::acquire_gil();
+                let py = gil.python();
+                duration.to_object(py);
+            })
+            .is_err())
+        };
+
+        check(-86399999913600, 0, -999999999, 0, 0); // min
+        check(86399999999999, 999999000, 999999999, 86399, 999999); // max
+
+        check_panic(super::MIN);
+        check_panic(super::MAX);
+    }
+
+    #[test]
+    fn test_pyo3_frompyobject() {
+        let gil = pyo3::Python::acquire_gil();
+        let py = gil.python();
+        let check = |s, ns, py_d, py_s, py_ms| {
+            let py_delta = PyDelta::new(py, py_d, py_s, py_ms, false).unwrap();
+            let py_delta: Duration = py_delta.extract().unwrap();
+            let delta = Duration { secs: s, nanos: ns };
+            assert_eq!(py_delta, delta);
+        };
+
+        check(-86399999913600, 0, -999999999, 0, 0); // min
+        check(86399999999999, 999999000, 999999999, 86399, 999999); // max
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::{Duration, OutOfRangeError, MAX, MIN};
