@@ -4,16 +4,16 @@
 //! A collection of parsed date and time items.
 //! They can be constructed incrementally while being checked for consistency.
 
+use crate::oldtime::Duration as OldDuration;
 use num_traits::ToPrimitive;
-use oldtime::Duration as OldDuration;
 
 use super::{ParseResult, IMPOSSIBLE, NOT_ENOUGH, OUT_OF_RANGE};
-use div::div_rem;
-use naive::{NaiveDate, NaiveDateTime, NaiveTime};
-use offset::{FixedOffset, LocalResult, Offset, TimeZone};
-use DateTime;
-use Weekday;
-use {Datelike, Timelike};
+use crate::div::div_rem;
+use crate::naive::{NaiveDate, NaiveDateTime, NaiveTime};
+use crate::offset::{FixedOffset, LocalResult, Offset, TimeZone};
+use crate::DateTime;
+use crate::Weekday;
+use crate::{Datelike, Timelike};
 
 /// Parsed parts of date and time. There are two classes of methods:
 ///
@@ -721,10 +721,10 @@ impl Parsed {
 mod tests {
     use super::super::{IMPOSSIBLE, NOT_ENOUGH, OUT_OF_RANGE};
     use super::Parsed;
-    use naive::{NaiveDate, NaiveTime, MAX_DATE, MIN_DATE};
-    use offset::{FixedOffset, TimeZone, Utc};
-    use Datelike;
-    use Weekday::*;
+    use crate::naive::{NaiveDate, NaiveTime, MAX_DATE, MIN_DATE};
+    use crate::offset::{FixedOffset, TimeZone, Utc};
+    use crate::Datelike;
+    use crate::Weekday::*;
 
     #[test]
     fn test_parsed_set_fields() {

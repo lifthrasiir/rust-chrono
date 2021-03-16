@@ -5,7 +5,7 @@ authors = [
     "Kang Seonghoon <public+rust@mearie.org>",
     "Brandon W Maister <quodlibetor@gmail.com>",
 ]
-
+edition = "2018"
 description = "Date and time library for Rust"
 homepage = "https://github.com/chronotope/chrono"
 documentation = "https://docs.rs/chrono/"

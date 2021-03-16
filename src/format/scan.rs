@@ -8,7 +8,7 @@
 #![allow(deprecated)]
 
 use super::{ParseResult, INVALID, OUT_OF_RANGE, TOO_SHORT};
-use Weekday;
+use crate::Weekday;
 
 /// Returns true when two slices are equal case-insensitively (in ASCII).
 /// Assumes that the `pattern` is already converted to lower case.

@@ -6,14 +6,14 @@
 use core::fmt;
 
 use super::{FixedOffset, LocalResult, Offset, TimeZone};
-use naive::{NaiveDate, NaiveDateTime};
+use crate::naive::{NaiveDate, NaiveDateTime};
+#[cfg(feature = "clock")]
+use crate::{Date, DateTime};
 #[cfg(all(
     feature = "clock",
     not(all(target_arch = "wasm32", not(target_os = "wasi"), feature = "wasmbind"))
 ))]
 use std::time::{SystemTime, UNIX_EPOCH};
-#[cfg(feature = "clock")]
-use {Date, DateTime};
 
 /// The UTC time zone. This is the most efficient time zone when you don't need the local time.
 /// It is also used as an offset (which is also a dummy type).

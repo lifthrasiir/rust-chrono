@@ -47,12 +47,12 @@ use core::str::FromStr;
 use std::error::Error;
 
 #[cfg(any(feature = "alloc", feature = "std", test))]
-use naive::{NaiveDate, NaiveTime};
+use crate::naive::{NaiveDate, NaiveTime};
 #[cfg(any(feature = "alloc", feature = "std", test))]
-use offset::{FixedOffset, Offset};
+use crate::offset::{FixedOffset, Offset};
 #[cfg(any(feature = "alloc", feature = "std", test))]
-use {Datelike, Timelike};
-use {Month, ParseMonthError, ParseWeekdayError, Weekday};
+use crate::{Datelike, Timelike};
+use crate::{Month, ParseMonthError, ParseWeekdayError, Weekday};
 
 #[cfg(feature = "unstable-locales")]
 pub(crate) mod locales;
@@ -465,8 +465,8 @@ fn format_inner<'a>(
         )
     };
 
+    use crate::div::{div_floor, mod_floor};
     use core::fmt::Write;
-    use div::{div_floor, mod_floor};
 
     match *item {
         Item::Literal(s) | Item::Space(s) => result.push_str(s),

@@ -423,7 +423,7 @@
 #![deny(missing_docs)]
 #![deny(missing_debug_implementations)]
 #![deny(dead_code)]
-// lints are added all the time, we test on 1.13
+// lints are added all the time, we test on 1.40
 #![allow(unknown_lints)]
 #![cfg_attr(not(any(feature = "std", test)), no_std)]
 #![cfg_attr(feature = "cargo-clippy", allow(
@@ -518,25 +518,25 @@ pub use round::{DurationRound, RoundingError, SubsecRound};
 /// A convenience module appropriate for glob imports (`use chrono::prelude::*;`).
 pub mod prelude {
     #[doc(no_inline)]
-    pub use Date;
+    pub use crate::Date;
     #[cfg(feature = "clock")]
     #[doc(no_inline)]
-    pub use Local;
+    pub use crate::Local;
     #[cfg(feature = "unstable-locales")]
     #[doc(no_inline)]
-    pub use Locale;
+    pub use crate::Locale;
     #[doc(no_inline)]
-    pub use SubsecRound;
+    pub use crate::SubsecRound;
     #[doc(no_inline)]
-    pub use {DateTime, SecondsFormat};
+    pub use crate::{DateTime, SecondsFormat};
     #[doc(no_inline)]
-    pub use {Datelike, Month, Timelike, Weekday};
+    pub use crate::{Datelike, Month, Timelike, Weekday};
     #[doc(no_inline)]
-    pub use {FixedOffset, Utc};
+    pub use crate::{FixedOffset, Utc};
     #[doc(no_inline)]
-    pub use {NaiveDate, NaiveDateTime, NaiveTime};
+    pub use crate::{NaiveDate, NaiveDateTime, NaiveTime};
     #[doc(no_inline)]
-    pub use {Offset, TimeZone};
+    pub use crate::{Offset, TimeZone};
 }
 
 // useful throughout the codebase

@@ -20,10 +20,10 @@
 
 use core::fmt;
 
-use format::{parse, ParseResult, Parsed, StrftimeItems};
-use naive::{NaiveDate, NaiveDateTime, NaiveTime};
-use Weekday;
-use {Date, DateTime};
+use crate::format::{parse, ParseResult, Parsed, StrftimeItems};
+use crate::naive::{NaiveDate, NaiveDateTime, NaiveTime};
+use crate::Weekday;
+use crate::{Date, DateTime};
 
 /// The conversion result from the local time to the timezone-aware datetime types.
 #[derive(Clone, PartialEq, Debug, Copy, Eq, Hash)]
@@ -406,7 +406,7 @@ pub trait TimeZone: Sized + Clone {
     /// Parses a string with the specified format string and returns a
     /// `DateTime` with the current offset.
     ///
-    /// See the [`::format::strftime`] module on the
+    /// See the [`crate::format::strftime`] module on the
     /// supported escape sequences.
     ///
     /// If the to-be-parsed string includes an offset, it *must* match the

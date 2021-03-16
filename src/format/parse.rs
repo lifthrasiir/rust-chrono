@@ -14,7 +14,7 @@ use super::scan;
 use super::{Fixed, InternalFixed, InternalInternal, Item, Numeric, Pad, Parsed};
 use super::{ParseError, ParseErrorKind, ParseResult};
 use super::{BAD_FORMAT, INVALID, NOT_ENOUGH, OUT_OF_RANGE, TOO_LONG, TOO_SHORT};
-use {DateTime, FixedOffset, Weekday};
+use crate::{DateTime, FixedOffset, Weekday};
 
 fn set_weekday_with_num_days_from_sunday(p: &mut Parsed, v: i64) -> ParseResult<()> {
     p.set_weekday(match v {
@@ -809,7 +809,7 @@ fn test_parse() {
 fn test_rfc2822() {
     use super::NOT_ENOUGH;
     use super::*;
-    use offset::FixedOffset;
+    use crate::offset::FixedOffset;
     use DateTime;
 
     // Test data - (input, Ok(expected result after parse and format) or Err(error code))
@@ -864,7 +864,7 @@ fn test_rfc2822() {
 #[cfg(test)]
 #[test]
 fn parse_rfc850() {
-    use {TimeZone, Utc};
+    use crate::{TimeZone, Utc};
 
     static RFC850_FMT: &'static str = "%A, %d-%b-%y %T GMT";
 
@@ -897,7 +897,7 @@ fn parse_rfc850() {
 #[test]
 fn test_rfc3339() {
     use super::*;
-    use offset::FixedOffset;
+    use crate::offset::FixedOffset;
     use DateTime;
 
     // Test data - (input, Ok(expected result after parse and format) or Err(error code))

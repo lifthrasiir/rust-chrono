@@ -3,21 +3,21 @@
 
 //! ISO 8601 calendar date with time zone.
 
+use crate::oldtime::Duration as OldDuration;
 #[cfg(any(feature = "alloc", feature = "std", test))]
 use core::borrow::Borrow;
 use core::cmp::Ordering;
 use core::ops::{Add, Sub};
 use core::{fmt, hash};
-use oldtime::Duration as OldDuration;
 
 #[cfg(feature = "unstable-locales")]
-use format::Locale;
+use crate::format::Locale;
 #[cfg(any(feature = "alloc", feature = "std", test))]
-use format::{DelayedFormat, Item, StrftimeItems};
-use naive::{self, IsoWeek, NaiveDate, NaiveTime};
-use offset::{TimeZone, Utc};
-use DateTime;
-use {Datelike, Weekday};
+use crate::format::{DelayedFormat, Item, StrftimeItems};
+use crate::naive::{self, IsoWeek, NaiveDate, NaiveTime};
+use crate::offset::{TimeZone, Utc};
+use crate::DateTime;
+use crate::{Datelike, Weekday};
 
 /// ISO 8601 calendar date with time zone.
 ///
@@ -36,7 +36,7 @@ use {Datelike, Weekday};
 ///   the corresponding local date should exist for at least a moment.
 ///   (It may still have a gap from the offset changes.)
 ///
-/// - The `TimeZone` is free to assign *any* [`Offset`](::offset::Offset) to the
+/// - The `TimeZone` is free to assign *any* [`Offset`](crate::offset::Offset) to the
 ///   local date, as long as that offset did occur in given day.
 ///
 ///   For example, if `2015-03-08T01:59-08:00` is followed by `2015-03-08T03:00-07:00`,
@@ -297,7 +297,7 @@ where
     }
 
     /// Formats the date with the specified format string.
-    /// See the [`::format::strftime`] module
+    /// See the [`crate::format::strftime`] module
     /// on the supported escape sequences.
     ///
     /// # Example
@@ -336,7 +336,7 @@ where
     }
 
     /// Formats the date with the specified format string and locale.
-    /// See the [`::format::strftime`] module
+    /// See the [`crate::format::strftime`] module
     /// on the supported escape sequences.
     #[cfg(feature = "unstable-locales")]
     #[inline]

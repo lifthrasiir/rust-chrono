@@ -4,16 +4,16 @@
 //! The local (system) time zone.
 
 #[cfg(not(all(target_arch = "wasm32", not(target_os = "wasi"), feature = "wasmbind")))]
-use sys::{self, Timespec};
+use crate::sys::{self, Timespec};
 
 use super::fixed::FixedOffset;
 use super::{LocalResult, TimeZone};
 #[cfg(not(all(target_arch = "wasm32", not(target_os = "wasi"), feature = "wasmbind")))]
-use naive::NaiveTime;
-use naive::{NaiveDate, NaiveDateTime};
-use {Date, DateTime};
+use crate::naive::NaiveTime;
+use crate::naive::{NaiveDate, NaiveDateTime};
+use crate::{Date, DateTime};
 #[cfg(not(all(target_arch = "wasm32", not(target_os = "wasi"), feature = "wasmbind")))]
-use {Datelike, Timelike};
+use crate::{Datelike, Timelike};
 
 /// Converts a `time::Tm` struct into the timezone-aware `DateTime`.
 /// This assumes that `time` is working correctly, i.e. any error is fatal.
@@ -196,8 +196,8 @@ impl TimeZone for Local {
 #[cfg(test)]
 mod tests {
     use super::Local;
-    use offset::TimeZone;
-    use Datelike;
+    use crate::offset::TimeZone;
+    use crate::Datelike;
 
     #[test]
     fn test_local_date_sanity_check() {

@@ -1,17 +1,15 @@
 // This is a part of Chrono.
 // See README.md and LICENSE.txt for details.
 
+use crate::datetime::DateTime;
+use crate::naive::NaiveDateTime;
+use crate::oldtime::Duration;
+use crate::TimeZone;
+use crate::Timelike;
 use core::cmp::Ordering;
 use core::fmt;
 use core::marker::Sized;
 use core::ops::{Add, Sub};
-use datetime::DateTime;
-use naive::NaiveDateTime;
-use oldtime::Duration;
-#[cfg(any(feature = "std", test))]
-use std;
-use TimeZone;
-use Timelike;
 
 /// Extension trait for subsecond rounding or truncation to a maximum number
 /// of digits. Rounding can be used to decrease the error variance when
@@ -303,8 +301,8 @@ impl std::error::Error for RoundingError {
 #[cfg(test)]
 mod tests {
     use super::{Duration, DurationRound, SubsecRound};
-    use offset::{FixedOffset, TimeZone, Utc};
-    use Timelike;
+    use crate::offset::{FixedOffset, TimeZone, Utc};
+    use crate::Timelike;
 
     #[test]
     fn test_round_subsecs() {

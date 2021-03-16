@@ -3,15 +3,15 @@
 
 //! The time zone which has a fixed offset from UTC.
 
+use crate::oldtime::Duration as OldDuration;
 use core::fmt;
 use core::ops::{Add, Sub};
-use oldtime::Duration as OldDuration;
 
 use super::{LocalResult, Offset, TimeZone};
-use div::div_mod_floor;
-use naive::{NaiveDate, NaiveDateTime, NaiveTime};
-use DateTime;
-use Timelike;
+use crate::div::div_mod_floor;
+use crate::naive::{NaiveDate, NaiveDateTime, NaiveTime};
+use crate::DateTime;
+use crate::Timelike;
 
 /// The time zone with fixed offset, from UTC-23:59:59 to UTC+23:59:59.
 ///
@@ -218,7 +218,7 @@ impl<Tz: TimeZone> Sub<FixedOffset> for DateTime<Tz> {
 #[cfg(test)]
 mod tests {
     use super::FixedOffset;
-    use offset::TimeZone;
+    use crate::offset::TimeZone;
 
     #[test]
     fn test_date_extreme_offset() {

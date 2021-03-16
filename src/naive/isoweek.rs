@@ -142,8 +142,8 @@ impl fmt::Debug for IsoWeek {
 
 #[cfg(test)]
 mod tests {
-    use naive::{internals, MAX_DATE, MIN_DATE};
-    use Datelike;
+    use crate::naive::{internals, MAX_DATE, MIN_DATE};
+    use crate::Datelike;
 
     #[test]
     fn test_iso_week_extremes() {

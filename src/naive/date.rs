@@ -3,20 +3,20 @@
 
 //! ISO 8601 calendar date without timezone.
 
+use crate::oldtime::Duration as OldDuration;
 #[cfg(any(feature = "alloc", feature = "std", test))]
 use core::borrow::Borrow;
 use core::ops::{Add, AddAssign, Sub, SubAssign};
 use core::{fmt, str};
 use num_traits::ToPrimitive;
-use oldtime::Duration as OldDuration;
 
-use div::div_mod_floor;
+use crate::div::div_mod_floor;
 #[cfg(any(feature = "alloc", feature = "std", test))]
-use format::DelayedFormat;
-use format::{parse, ParseError, ParseResult, Parsed, StrftimeItems};
-use format::{Item, Numeric, Pad};
-use naive::{IsoWeek, NaiveDateTime, NaiveTime};
-use {Datelike, Weekday};
+use crate::format::DelayedFormat;
+use crate::format::{parse, ParseError, ParseResult, Parsed, StrftimeItems};
+use crate::format::{Item, Numeric, Pad};
+use crate::naive::{IsoWeek, NaiveDateTime, NaiveTime};
+use crate::{Datelike, Weekday};
 
 use super::internals::{self, DateImpl, Mdf, Of, YearFlags};
 use super::isoweek;
@@ -1906,9 +1906,9 @@ mod tests {
     use super::NaiveDate;
     use super::{MAX_DATE, MAX_DAYS_FROM_YEAR_0, MAX_YEAR};
     use super::{MIN_DATE, MIN_DAYS_FROM_YEAR_0, MIN_YEAR};
-    use oldtime::Duration;
+    use crate::oldtime::Duration;
+    use crate::{Datelike, Weekday};
     use std::{i32, u32};
-    use {Datelike, Weekday};
 
     #[test]
     fn test_date_from_ymd() {
