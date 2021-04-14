@@ -152,7 +152,8 @@ pub fn short_or_long_month0(s: &str) -> ParseResult<(&str, u8)> {
 
     // tries to consume the suffix if possible
     let suffix = LONG_MONTH_SUFFIXES[month0 as usize];
-    if s.len() >= suffix.len() && equals(&s[..suffix.len()], suffix) {
+    if s.chars().count() >= suffix.chars().count() && s.chars().zip(suffix.chars()).all(|(a, b)| a.to_ascii_lowercase() == b.to_ascii_lowercase()) {
+        // At this point, the parts that matter are guaranteed to be ASCII
         s = &s[suffix.len()..];
     }
 
@@ -170,7 +171,8 @@ pub fn short_or_long_weekday(s: &str) -> ParseResult<(&str, Weekday)> {
 
     // tries to consume the suffix if possible
     let suffix = LONG_WEEKDAY_SUFFIXES[weekday.num_days_from_monday() as usize];
-    if s.len() >= suffix.len() && equals(&s[..suffix.len()], suffix) {
+    if s.chars().count() >= suffix.chars().count() && s.chars().zip(suffix.chars()).all(|(a, b)| a.to_ascii_lowercase() == b.to_ascii_lowercase()) {
+        // At this point, the parts that matter are guaranteed to be ASCII
         s = &s[suffix.len()..];
     }
 

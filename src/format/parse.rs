@@ -637,6 +637,7 @@ fn test_parse() {
     check!("Aprill",    [fix!(LongMonthName), lit!("l")]; month: 4);
     check!("Aprl",      [fix!(LongMonthName), lit!("l")]; month: 4);
     check!("April",     [fix!(LongMonthName), lit!("il")]; TOO_SHORT); // do not backtrack
+    check!("AprilŽ",    [fix!(LongMonthName)]; TOO_LONG); // Just need to make sure it doesn't panic
     check!("thu",       [fix!(ShortWeekdayName)]; weekday: Weekday::Thu);
     check!("Thu",       [fix!(ShortWeekdayName)]; weekday: Weekday::Thu);
     check!("THU",       [fix!(ShortWeekdayName)]; weekday: Weekday::Thu);
@@ -653,6 +654,7 @@ fn test_parse() {
     check!("Thursdays", [fix!(LongWeekdayName), lit!("s")]; weekday: Weekday::Thu);
     check!("Thus",      [fix!(LongWeekdayName), lit!("s")]; weekday: Weekday::Thu);
     check!("Thursday",  [fix!(LongWeekdayName), lit!("rsday")]; TOO_SHORT); // do not backtrack
+    check!("MONYAŽA",   [fix!(LongWeekdayName)]; TOO_LONG); // Just need to make sure it doesn't panic
 
     // fixed: am/pm
     check!("am",  [fix!(LowerAmPm)]; hour_div_12: 0);
