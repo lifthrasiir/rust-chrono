@@ -2274,6 +2274,87 @@ pub mod serde {
     }
 }
 
+#[cfg(feature = "pyo3")]
+mod pyo3 {
+    use super::{Datelike, NaiveDate, NaiveDateTime, NaiveTime, Timelike};
+    use pyo3::conversion::{FromPyObject, IntoPy, PyTryFrom, ToPyObject};
+    use pyo3::types::{PyDateAccess, PyDateTime, PyTimeAccess};
+
+    impl ToPyObject for NaiveDateTime {
+        fn to_object(&self, py: pyo3::Python) -> pyo3::PyObject {
+            let mdf = self.date.mdf();
+            let (yy, mm, dd) = (self.date.year(), mdf.month(), mdf.day());
+            let (h, m, s) = self.time.hms();
+            let ns = self.time.nanosecond();
+            let (ms, fold) = match ns.checked_sub(1_000_000_000) {
+                Some(ns) => (ns / 1000, true),
+                None => (ns / 1000, false),
+            };
+            let datetime = PyDateTime::new_with_fold(
+                py, yy, mm as u8, dd as u8, h as u8, m as u8, s as u8, ms, None, fold,
+            )
+            .expect("Failed to construct datetime");
+            datetime.into()
+        }
+    }
+
+    impl IntoPy<pyo3::PyObject> for NaiveDateTime {
+        fn into_py(self, py: pyo3::Python) -> pyo3::PyObject {
+            ToPyObject::to_object(&self, py)
+        }
+    }
+
+    impl FromPyObject<'_> for NaiveDateTime {
+        fn extract(ob: &pyo3::PyAny) -> pyo3::PyResult<NaiveDateTime> {
+            let dt = <PyDateTime as PyTryFrom>::try_from(ob)?;
+            let ms = dt.get_fold() as u32 * 1_000_000 + dt.get_microsecond();
+            let (h, m, s) = (dt.get_hour(), dt.get_minute(), dt.get_second());
+            Ok(NaiveDateTime::new(
+                NaiveDate::from_ymd(dt.get_year(), dt.get_month() as u32, dt.get_day() as u32),
+                NaiveTime::from_hms_micro(h as u32, m as u32, s as u32, ms),
+            ))
+        }
+    }
+
+    #[test]
+    fn test_pyo3_topyobject() {
+        use std::cmp::Ordering;
+
+        let gil = pyo3::Python::acquire_gil();
+        let py = gil.python();
+        let check = |y, mo, d, h, m, s, ms, py_ms, f| {
+            let datetime = NaiveDate::from_ymd(y, mo, d).and_hms_micro(h, m, s, ms).to_object(py);
+            let datetime: &PyDateTime = datetime.extract(py).unwrap();
+            let py_datetime = PyDateTime::new_with_fold(
+                py, y, mo as u8, d as u8, h as u8, m as u8, s as u8, py_ms, None, f,
+            )
+            .unwrap();
+            assert_eq!(datetime.compare(py_datetime).unwrap(), Ordering::Equal);
+        };
+
+        check(2014, 5, 6, 7, 8, 9, 1_999_999, 999_999, true);
+        check(2014, 5, 6, 7, 8, 9, 999_999, 999_999, false);
+    }
+
+    #[test]
+    fn test_pyo3_frompyobject() {
+        let gil = pyo3::Python::acquire_gil();
+        let py = gil.python();
+        let check = |y, mo, d, h, m, s, ms, py_ms, f| {
+            let py_datetime = PyDateTime::new_with_fold(
+                py, y, mo as u8, d as u8, h as u8, m as u8, s as u8, py_ms, None, f,
+            )
+            .unwrap();
+            let py_datetime: NaiveDateTime = py_datetime.extract().unwrap();
+            let datetime = NaiveDate::from_ymd(y, mo, d).and_hms_micro(h, m, s, ms);
+            assert_eq!(py_datetime, datetime);
+        };
+
+        check(2014, 5, 6, 7, 8, 9, 1_999_999, 999_999, true);
+        check(2014, 5, 6, 7, 8, 9, 999_999, 999_999, false);
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::NaiveDateTime;

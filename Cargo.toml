@@ -42,6 +42,7 @@ num-traits = { version = "0.2", default-features = false }
 rustc-serialize = { version = "0.3.20", optional = true }
 serde = { version = "1.0.99", default-features = false, optional = true }
 pure-rust-locales = { version = "0.5.2", optional = true }
+pyo3 = { version = "0.13.2", optional = true }
 
 [target.'cfg(all(target_arch = "wasm32", not(any(target_os = "emscripten", target_os = "wasi"))))'.dependencies]
 wasm-bindgen = { version = "0.2", optional = true }

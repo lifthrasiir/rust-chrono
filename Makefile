@@ -26,4 +26,4 @@ test:
 
 .PHONY: doc
 doc: authors readme
-	cargo doc --features 'serde rustc-serialize bincode'
+	cargo doc --features 'serde rustc-serialize bincode pyo3'

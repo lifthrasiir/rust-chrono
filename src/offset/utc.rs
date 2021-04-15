@@ -98,3 +98,34 @@ impl fmt::Display for Utc {
         write!(f, "UTC")
     }
 }
+
+#[cfg(feature = "pyo3")]
+mod pyo3 {
+    use super::Utc;
+    use pyo3::PyObject;
+    use pyo3::conversion::{FromPyObject, IntoPy, PyTryFrom, ToPyObject};
+    use pyo3::ffi::PyDateTimeAPI;
+    use pyo3::types::PyDate;
+
+    impl ToPyObject for Utc {
+        fn to_object(&self, py: pyo3::Python) -> pyo3::PyObject {
+            unsafe { PyObject::from_borrowed_ptr(py, PyDateTimeAPI.TimeZone_UTC) }
+        }
+    }
+
+    impl IntoPy<pyo3::PyObject> for Utc {
+        fn into_py(self, py: pyo3::Python) -> pyo3::PyObject {
+            ToPyObject::to_object(&self, py)
+        }
+    }
+
+    impl FromPyObject<'_> for Utc {
+        fn extract(ob: &pyo3::PyAny) -> pyo3::PyResult<Utc> {
+            let date = <PyDate as PyTryFrom>::try_from(ob)?;
+            todo!("Not sure how this can be done");
+            Ok(Utc)
+        }
+    }
+
+    // TODO add tests
+}

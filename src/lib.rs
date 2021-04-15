@@ -49,11 +49,13 @@
 //!
 //! - `wasmbind`: Enable integration with [wasm-bindgen][] and its `js-sys` project
 //! - [`serde`][]: Enable serialization/deserialization via serde.
+//! - [`pyo3`][]: Enable integration with pyo3.
 //! - `unstable-locales`: Enable localization. This adds various methods with a
 //!   `_localized` suffix. The implementation and API may change or even be
 //!   removed in a patch release. Feedback welcome.
 //!
 //! [`serde`]: https://github.com/serde-rs/serde
+//! [`pyo3`]: https://github.com/PyO3/pyo3
 //! [wasm-bindgen]: https://github.com/rustwasm/wasm-bindgen
 //!
 //! See the [cargo docs][] for examples of specifying features.
@@ -486,6 +488,8 @@ extern crate doc_comment;
 extern crate js_sys;
 #[cfg(feature = "unstable-locales")]
 extern crate pure_rust_locales;
+#[cfg(feature = "pyo3")]
+extern crate pyo3;
 #[cfg(feature = "bench")]
 extern crate test;
 #[cfg(all(target_arch = "wasm32", not(target_os = "wasi"), feature = "wasmbind"))]
