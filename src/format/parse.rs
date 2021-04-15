@@ -197,11 +197,18 @@ fn parse_rfc3339<'a>(parsed: &mut Parsed, mut s: &'a str) -> ParseResult<(&'a st
     };
 
     parsed.set_hour(try_consume!(scan::number(s, 2, 2)))?;
-    s = scan::char(s, b':')?;
-    parsed.set_minute(try_consume!(scan::number(s, 2, 2)))?;
-    s = scan::char(s, b':')?;
-    parsed.set_second(try_consume!(scan::number(s, 2, 2)))?;
-    if s.starts_with('.') {
+
+    if s.starts_with(':') {
+        parsed.set_minute(try_consume!(scan::number(&s[1..], 2, 2)))?;
+    } else {
+        parsed.set_minute(0)?;
+    }
+
+    if s.starts_with(':') {
+        parsed.set_second(try_consume!(scan::number(&s[1..], 2, 2)))?;
+    }
+
+    if s.starts_with('.') || s.starts_with(',') {
         let nanosecond = try_consume!(scan::nanosecond(&s[1..]));
         parsed.set_nanosecond(nanosecond)?;
     }
