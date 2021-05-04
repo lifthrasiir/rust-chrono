@@ -184,6 +184,15 @@ pub struct NaiveTime {
     frac: u32,
 }
 
+#[cfg(feature = "arbitrary")]
+impl arbitrary::Arbitrary<'_> for NaiveTime {
+    fn arbitrary(u: &mut arbitrary::Unstructured) -> arbitrary::Result<NaiveTime> {
+        let secs = u.int_in_range(0..=86_400)?;
+        let frac = u.int_in_range(0..=2_000_000_000)?;
+        Ok(NaiveTime { secs, frac })
+    }
+}
+
 impl NaiveTime {
     /// Makes a new `NaiveTime` from hour, minute and second.
     ///

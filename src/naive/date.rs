@@ -105,6 +105,15 @@ pub const MIN_DATE: NaiveDate = NaiveDate { ymdf: (MIN_YEAR << 13) | (1 << 4) | 
 /// The maximum possible `NaiveDate` (December 31, 262143 CE).
 pub const MAX_DATE: NaiveDate = NaiveDate { ymdf: (MAX_YEAR << 13) | (365 << 4) | 0o17 /*F*/ };
 
+#[cfg(feature = "arbitrary")]
+impl arbitrary::Arbitrary<'_> for NaiveDate {
+    fn arbitrary(u: &mut arbitrary::Unstructured) -> arbitrary::Result<NaiveDate> {
+        let year = u.int_in_range(MIN_YEAR..=MAX_YEAR)?;
+        let ord = u.int_in_range(1..=366)?;
+        NaiveDate::from_yo_opt(year, ord).ok_or(arbitrary::Error::IncorrectFormat)
+    }
+}
+
 // as it is hard to verify year flags in `MIN_DATE` and `MAX_DATE`,
 // we use a separate run-time test.
 #[test]

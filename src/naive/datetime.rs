@@ -59,6 +59,7 @@ pub const MAX_DATETIME: NaiveDateTime = NaiveDateTime { date: MAX_DATE, time: MA
 /// assert_eq!(dt.num_seconds_from_midnight(), 33011);
 /// ```
 #[derive(PartialEq, Eq, PartialOrd, Ord, Copy, Clone)]
+#[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
 pub struct NaiveDateTime {
     date: NaiveDate,
     time: NaiveTime,
