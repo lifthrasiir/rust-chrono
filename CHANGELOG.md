@@ -17,6 +17,9 @@ Versions with only mechanical changes will be omitted from the following list.
 * Add support for microseconds timestamps serde serialization/deserialization (#304)
 * Fix `DurationRound` is not TZ aware (#495)
 * Implement `DurationRound` for `NaiveDateTime`
+* Implement `arbitrary::Arbitrary` for `NaiveDate`, `NaiveTime`, and
+  `NaiveDateTime`.  You need to enable the "arbitrary" feature to get these
+  impls.
 
 ## 0.4.19
 
