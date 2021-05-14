@@ -215,6 +215,20 @@ fn parse_rfc3339<'a>(parsed: &mut Parsed, mut s: &'a str) -> ParseResult<(&'a st
     Ok((s, ()))
 }
 
+fn get_fixed_item_len<'a, B>(item: Option<&B>) -> Option<usize>
+where
+    B: Borrow<Item<'a>>,
+{
+    use super::Fixed::*;
+
+    item.map(|i| match *i.borrow() {
+        Item::Fixed(Internal(InternalFixed { val: InternalInternal::Nanosecond3NoDot })) => 3,
+        Item::Fixed(Internal(InternalFixed { val: InternalInternal::Nanosecond6NoDot })) => 6,
+        Item::Fixed(Internal(InternalFixed { val: InternalInternal::Nanosecond9NoDot })) => 9,
+        _ => 0,
+    })
+}
+
 /// Tries to parse given string into `parsed` with given formatting items.
 /// Returns `Ok` when the entire string has been parsed (otherwise `parsed` should not be used).
 /// There should be no trailing string after parsing;
@@ -260,7 +274,17 @@ where
         }};
     }
 
-    for item in items {
+    // convert items to a pair (current, Option(next_item))
+    // so we can have information about the next item
+    let items: Vec<B> = items.collect::<Vec<_>>();
+    let last_item = items.last();
+    let mut items: Vec<(&B, Option<&B>)> =
+        items.windows(2).map(|arr| (&arr[0], Some(&arr[1]))).collect::<Vec<_>>();
+    if let Some(last_item) = last_item {
+        items.push((last_item, None));
+    }
+
+    for (item, next_item) in items {
         match *item.borrow() {
             Item::Literal(prefix) => {
                 if s.len() < prefix.len() {
@@ -316,8 +340,10 @@ where
                     Minute => (2, false, Parsed::set_minute),
                     Second => (2, false, Parsed::set_second),
                     Nanosecond => (9, false, Parsed::set_nanosecond),
-                    Timestamp => (usize::MAX, false, Parsed::set_timestamp),
-
+                    Timestamp => {
+                        let next_size = get_fixed_item_len(next_item).unwrap_or(0);
+                        (s.len() - next_size, false, Parsed::set_timestamp)
+                    }
                     // for the future expansion
                     Internal(ref int) => match int._dummy {},
                 };
@@ -802,6 +828,9 @@ fn test_parse() {
     check!("12345678901234.56789",
            [num!(Timestamp), fix!(Nanosecond)];
            nanosecond: 567_890_000, timestamp: 12_345_678_901_234);
+    check!("12345678901234567",
+	   [num!(Timestamp), internal_fix!(Nanosecond3NoDot)];
+	   nanosecond: 567_000_000, timestamp: 12_345_678_901_234);
 }
 
 #[cfg(test)]
