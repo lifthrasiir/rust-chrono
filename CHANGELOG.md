@@ -11,6 +11,9 @@ breakage if you use `no-default-features`.
 There were/are numerous minor versions before 1.0 due to the language changes.
 Versions with only mechanical changes will be omitted from the following list.
 
+## 0.4.21 (unreleased)
+* Add `from_timestamp_millis`, `from_timestamp_micros`, `from_timestamp_nanos` for `NaiveDateTime`
+
 ## 0.4.20 (unreleased)
 
 * Add more formatting documentation and examples.

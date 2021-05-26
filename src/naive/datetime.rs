@@ -118,6 +118,90 @@ impl NaiveDateTime {
     }
 
     /// Makes a new `NaiveDateTime` corresponding to a UTC date and time,
+    /// from the number of non-leap milliseconds
+    /// since the midnight UTC on January 1, 1970 (aka "UNIX timestamp")
+    ///
+    /// Panics on the out-of-range number of seconds.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use chrono::{NaiveDateTime, NaiveDate};
+    ///
+    ///
+    /// let dt = NaiveDate::from_ymd(1970, 1, 1).and_hms_milli(0, 0, 0, 42);
+    ///
+    /// let got = NaiveDateTime::from_timestamp_millis(dt.timestamp_millis());
+    /// assert_eq!(dt, got);
+    ///
+    /// ```
+    #[inline]
+    pub fn from_timestamp_millis(milliseconds: i64) -> NaiveDateTime {
+        let timestamp_seconds = milliseconds / 1000;
+        let datetime = NaiveDateTime::from_timestamp_opt(
+            timestamp_seconds,
+            (milliseconds % 1000 * 1000000) as u32,
+        );
+        datetime.expect("invalid or out-of-range datetime")
+    }
+
+    /// Makes a new `NaiveDateTime` corresponding to a UTC date and time,
+    /// from the number of non-leap microseconds
+    /// since the midnight UTC on January 1, 1970 (aka "UNIX timestamp")
+    ///
+    /// Panics on the out-of-range number of seconds.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use chrono::{NaiveDateTime, NaiveDate};
+    ///
+    ///
+    /// let dt = NaiveDate::from_ymd(1970, 1, 1).and_hms_milli(0, 0, 0, 42);
+    ///
+    /// let got = NaiveDateTime::from_timestamp_micros(dt.timestamp_micros());
+    /// assert_eq!(dt, got);
+    ///
+    /// ```
+    #[inline]
+    pub fn from_timestamp_micros(microseconds: i64) -> NaiveDateTime {
+        let timestamp_seconds = microseconds / 1_000_000;
+        let datetime = NaiveDateTime::from_timestamp_opt(
+            timestamp_seconds,
+            ((microseconds % 1_000_000) * 1000) as u32,
+        );
+        datetime.expect("invalid or out-of-range datetime")
+    }
+
+    /// Makes a new `NaiveDateTime` corresponding to a UTC date and time,
+    /// from the number of non-leap nanoseconds
+    /// since the midnight UTC on January 1, 1970 (aka "UNIX timestamp")
+    ///
+    /// Panics on the out-of-range number of seconds.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use chrono::{NaiveDateTime, NaiveDate};
+    ///
+    ///
+    /// let dt = NaiveDate::from_ymd(1970, 1, 1).and_hms_milli(0, 0, 0, 42);
+    ///
+    /// let got = NaiveDateTime::from_timestamp_nanos(dt.timestamp_nanos());
+    /// assert_eq!(dt, got);
+    ///
+    /// ```
+    #[inline]
+    pub fn from_timestamp_nanos(nanoseconds: i64) -> NaiveDateTime {
+        let timestamp_seconds = nanoseconds / 1_000_000_000;
+        let datetime = NaiveDateTime::from_timestamp_opt(
+            timestamp_seconds,
+            (nanoseconds % 1_000_000_000) as u32,
+        );
+        datetime.expect("invalid or out-of-range datetime")
+    }
+
+    /// Makes a new `NaiveDateTime` corresponding to a UTC date and time,
     /// from the number of non-leap seconds
     /// since the midnight UTC on January 1, 1970 (aka "UNIX timestamp")
     /// and the number of nanoseconds since the last whole non-leap second.
