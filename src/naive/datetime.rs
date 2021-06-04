@@ -2307,7 +2307,7 @@ mod tests {
                 result.map(|(y, m, d, h, n, s)| NaiveDate::from_ymd(y, m, d).and_hms(h, n, s));
             assert_eq!(lhs.checked_add_signed(rhs), sum);
             assert_eq!(lhs.checked_sub_signed(-rhs), sum);
-        };
+        }
 
         check(
             (2014, 5, 6, 7, 8, 9),
@@ -2513,7 +2513,7 @@ mod tests {
         let base = NaiveDate::from_ymd(2000, 1, 1).and_hms(0, 0, 0);
         let t = -946684799990000;
         let time = base + Duration::microseconds(t);
-        assert_eq!(t, time.signed_duration_since(base).num_microseconds().unwrap());
+        assert_eq!(t, time.signed_duration_since(base).whole_microseconds() as i64);
     }
 
     #[test]

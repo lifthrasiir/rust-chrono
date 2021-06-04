@@ -36,7 +36,7 @@ __doctest = []
 
 [dependencies]
 libc = { version = "0.2.69", optional = true }
-time = { version = "0.1.43", optional = true }
+time = { version = "0.2", optional = true }
 num-integer = { version = "0.1.36", default-features = false }
 num-traits = { version = "0.2", default-features = false }
 rustc-serialize = { version = "0.3.20", optional = true }

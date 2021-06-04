@@ -1110,15 +1110,15 @@ mod tests {
         let min_days_from_year_1970 =
             MIN_DATE.signed_duration_since(NaiveDate::from_ymd(1970, 1, 1));
         assert_eq!(
-            parse!(timestamp: min_days_from_year_1970.num_seconds()),
+            parse!(timestamp: min_days_from_year_1970.whole_seconds()),
             ymdhms(MIN_DATE.year(), 1, 1, 0, 0, 0)
         );
         assert_eq!(
-            parse!(timestamp: year_0_from_year_1970.num_seconds()),
+            parse!(timestamp: year_0_from_year_1970.whole_seconds()),
             ymdhms(0, 1, 1, 0, 0, 0)
         );
         assert_eq!(
-            parse!(timestamp: max_days_from_year_1970.num_seconds() + 86399),
+            parse!(timestamp: max_days_from_year_1970.whole_seconds() + 86399),
             ymdhms(MAX_DATE.year(), 12, 31, 23, 59, 59)
         );
 
