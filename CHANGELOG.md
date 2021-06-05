@@ -17,6 +17,7 @@ Versions with only mechanical changes will be omitted from the following list.
 * Add support for microseconds timestamps serde serialization/deserialization (#304)
 * Fix `DurationRound` is not TZ aware (#495)
 * Implement `DurationRound` for `NaiveDateTime`
+* Correct build for wasm32-unknown-emscripten target
 
 ## 0.4.19
 
