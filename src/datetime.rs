@@ -7,6 +7,7 @@ use core::cmp::Ordering;
 use core::ops::{Add, Sub};
 use core::{fmt, hash, str};
 use oldtime::Duration as OldDuration;
+use std::convert::TryFrom;
 #[cfg(any(feature = "std", test))]
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -307,6 +308,20 @@ impl<Tz: TimeZone> DateTime<Tz> {
     #[inline]
     pub fn naive_local(&self) -> NaiveDateTime {
         self.datetime + self.offset.fix()
+    }
+
+    /// Retrieve the elapsed years from now to the given [`DateTime`].
+    pub fn elapsed_years(&self) -> u32 {
+        let now = Utc::now().with_timezone(&self.timezone());
+
+        let years =
+            if (now.month(), now.day(), now.time()) < (self.month(), self.day(), self.time()) {
+                now.year() - self.year() - 1
+            } else {
+                now.year() - self.year()
+            };
+
+        u32::try_from(years).unwrap_or(0)
     }
 }
 
@@ -2426,6 +2441,7 @@ pub mod serde {
 #[cfg(test)]
 mod tests {
     use super::DateTime;
+    use consts::f64;
     use naive::{NaiveDate, NaiveTime};
     #[cfg(feature = "clock")]
     use offset::Local;
@@ -2841,5 +2857,19 @@ mod tests {
         assert_eq!(format!("  {}", ymd_formatted), format!("{:>17}", ymd));
         assert_eq!(format!("{}  ", ymd_formatted), format!("{:<17}", ymd));
         assert_eq!(format!(" {} ", ymd_formatted), format!("{:^17}", ymd));
+    }
+
+    #[test]
+    fn test_years_elapsed() {
+        // This is always at least one year because 1 year = 52.1775 weeks.
+        let one_year_ago = Utc::today() - Duration::weeks((f64::WEEK_PER_YEAR * 1.5).ceil() as i64);
+        // A bit more than 2 years.
+        let two_year_ago = Utc::today() - Duration::weeks((f64::WEEK_PER_YEAR * 2.5).ceil() as i64);
+
+        assert_eq!(one_year_ago.elapsed_years(), 1);
+        assert_eq!(two_year_ago.elapsed_years(), 2);
+
+        // if the given DateTime is later than now, the function will always return 0.
+        assert_eq!((Utc::today() + Duration::weeks(12)).elapsed_years(), 0);
     }
 }

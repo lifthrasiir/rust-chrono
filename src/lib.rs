@@ -594,6 +594,20 @@ mod datetime;
 pub mod format;
 mod round;
 
+/// Constants that can be used by all components.
+pub mod consts {
+    /// Constants of type `f32`.
+    pub mod f32 {
+        /// Number of weeks in a year.
+        pub const WEEKS_PER_YEAR: f32 = 52.1775;
+    }
+    /// Constants of type `f64`.
+    pub mod f64 {
+        /// Number of weeks in a year.
+        pub const WEEKS_PER_YEAR: f64 = 52.1775;
+    }
+}
+
 #[cfg(feature = "__internal_bench")]
 #[doc(hidden)]
 pub use naive::__BenchYearFlags;
