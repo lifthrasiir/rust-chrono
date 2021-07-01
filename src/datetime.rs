@@ -96,6 +96,33 @@ impl<Tz: TimeZone> DateTime<Tz> {
         DateTime { datetime: datetime, offset: offset }
     }
 
+    /// Makes a new `DateTime` with given **local** datetime and offset that 
+    /// presents local timezone. 
+    /// 
+    /// # Example 
+    ///
+    /// ```
+    /// let naivedatetime_utc = NaiveDate::from_ymd(2000, 1, 12).and_hms(2, 0, 0);
+    /// let datetime_utc = DateTime::<Utc>::from_utc(naivedatetime_utc, Utc);
+    ///
+    /// let timezone_east = FixedOffset::east(8 * 60 * 60);
+    /// let naivedatetime_east = NaiveDate::from_ymd(2000, 1, 12).and_hms(10, 0, 0);
+    /// let datetime_east = DateTime::<FixedOffset>::from_local(naivedatetime_east, timezone_east);
+    ///
+    /// let timezone_west = FixedOffset::west(7 * 60 * 60);
+    /// let naivedatetime_west = NaiveDate::from_ymd(2000, 1, 11).and_hms(19, 0, 0);
+    /// let datetime_west = DateTime::<FixedOffset>::from_local(naivedatetime_west, timezone_west);
+
+    /// assert_eq!(datetime_east, datetime_utc.with_timezone(&timezone_east));
+    /// assert_eq!(datetime_west, datetime_utc.with_timezone(&timezone_west));
+    /// ```
+    #[inline]
+    pub fn from_local(datetime: NaiveDateTime, offset: Tz::Offset) ->DateTime<Tz> {
+        let datetime_utc = datetime - offset.fix();
+
+        DateTime { datetime: datetime_utc, offset: offset }
+    }
+
     /// Retrieves a date component
     ///
     /// Unless you are immediately planning on turning this into a `DateTime`
@@ -2841,5 +2868,25 @@ mod tests {
         assert_eq!(format!("  {}", ymd_formatted), format!("{:>17}", ymd));
         assert_eq!(format!("{}  ", ymd_formatted), format!("{:<17}", ymd));
         assert_eq!(format!(" {} ", ymd_formatted), format!("{:^17}", ymd));
+    }
+
+    #[test]
+    fn test_datetime_from_local() {
+        // 2000-01-12T02:00:00Z
+        let naivedatetime_utc = NaiveDate::from_ymd(2000, 1, 12).and_hms(2, 0, 0);
+        let datetime_utc = DateTime::<Utc>::from_utc(naivedatetime_utc, Utc);
+
+        // 2000-01-12T10:00:00+8:00:00
+        let timezone_east = FixedOffset::east(8 * 60 * 60);
+        let naivedatetime_east = NaiveDate::from_ymd(2000, 1, 12).and_hms(10, 0, 0);
+        let datetime_east = DateTime::<FixedOffset>::from_local(naivedatetime_east, timezone_east);
+
+        // 2000-01-11T19:00:00-7:00:00
+        let timezone_west = FixedOffset::west(7 * 60 * 60);
+        let naivedatetime_west = NaiveDate::from_ymd(2000, 1, 11).and_hms(19, 0, 0);
+        let datetime_west = DateTime::<FixedOffset>::from_local(naivedatetime_west, timezone_west);
+
+        assert_eq!(datetime_east, datetime_utc.with_timezone(&timezone_east));
+        assert_eq!(datetime_west, datetime_utc.with_timezone(&timezone_west));
     }
 }
